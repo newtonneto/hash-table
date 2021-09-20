@@ -8,5 +8,7 @@ public class Test {
 
         hash.insertItem("TESTE");
         System.out.println(hash.findElement("TESTE"));
+        hash.insertItem("zZzZzZz");
+        hash.insertItem("hUASHUAHS");
     }
 }

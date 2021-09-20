@@ -6,12 +6,12 @@ import com.sun.tools.jconsole.JConsoleContext;
 public class HashTable implements IHashTable {
     private Integer size;
     private Object[] hashtable;
-    private double occupancy_rate;
+    private double used_slots;
 
     public HashTable(Integer size) {
         this.size = size;
         this.hashtable = new Object[size];
-        this.occupancy_rate = 0;
+        this.used_slots = 0;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class HashTable implements IHashTable {
 
                 return null;
             } else if (element == storaged_item) {
-                System.out.println("-> Elemento " + element.toString() + " encontrado no índice " + compression_value + ".");
+                System.out.println("-> Elemento " + element + " encontrado no índice " + compression_value + ".");
 
                 return compression_value;
             } else {
@@ -54,8 +54,19 @@ public class HashTable implements IHashTable {
     public void insertItem(Object element) {
         Integer dispersion_value = this.dispersion(element);
         Integer compression_value = this.compression(dispersion_value);
+        double alfa = this.calculateAlfa();
 
-        this.linearProbingInsert(compression_value, element);
+        if (element instanceof String && element != "AVAILABLE" && alfa <= 0.5) {
+            this.linearProbingInsert(compression_value, element);
+        } else if (alfa > 0.5) {
+            //re hash
+        } else {
+            //exception here
+        }
+    }
+
+    public double calculateAlfa() {
+        return this.used_slots / this.size;
     }
 
     public void linearProbingInsert(Integer compression_value, Object element) {
@@ -66,11 +77,12 @@ public class HashTable implements IHashTable {
             //Recebe o que está armazenado no indice atual
             Object storaged_item = this.hashtable[compression_value];
 
-            if (storaged_item == null) {
-                System.out.println("-> Alocando " + element.toString() + " no índice " + compression_value + " após " +
+            if (storaged_item == null || storaged_item == "AVAILABLE") {
+                System.out.println("-> Alocando " + element + " no índice " + compression_value + " após " +
                         allocation_attempts + " tentativa(s) de inserção.");
 
                 this.hashtable[compression_value] = element;
+                this.used_slots++;
 
                 return;
             } else {
