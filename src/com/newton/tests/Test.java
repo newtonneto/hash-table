@@ -7,6 +7,6 @@ public class Test {
         HashTable hash = new HashTable(11);
 
         hash.insertItem("TESTE");
-        hash.insertItem("TESTE");
+        System.out.println(hash.findElement("TESTE"));
     }
 }

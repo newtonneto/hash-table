@@ -15,11 +15,38 @@ public class HashTable implements IHashTable {
     }
 
     @Override
-    public Object findElement(Object element) {
-        return null;
+    public Integer findElement(Object element) {
+        Integer dispersion_value = this.dispersion(element);
+        Integer compression_value = this.compression(dispersion_value);
+        Integer index_finded_element = this.linearProbingFind(compression_value, element);
+
+        return index_finded_element;
     }
 
-    public Object linearProbingFind(Object element) {
+    public Integer linearProbingFind(Integer compression_value, Object element) {
+        //Armazena a quantidade de tentativas de busca, o número não deve execeder o tamanho do array
+        Integer find_attempts = 0;
+
+        while (find_attempts < this.size) {
+            //Recebe o que está armazenado no indice atual
+            Object storaged_item = this.hashtable[compression_value];
+
+            if (storaged_item == null) {
+                System.out.println("NO_SUCH_KEY");
+
+                return null;
+            } else if (element == storaged_item) {
+                System.out.println("-> Elemento " + element.toString() + " encontrado no índice " + compression_value + ".");
+
+                return compression_value;
+            } else {
+                find_attempts++;
+                compression_value = this.compression(compression_value + 1);
+            }
+        }
+
+        System.out.println("NO_SUCH_KEY");
+
         return null;
     }
 
@@ -49,7 +76,7 @@ public class HashTable implements IHashTable {
             } else {
                 System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
                 allocation_attempts++;
-                compression_value++;
+                compression_value = this.compression(compression_value + 1);
             }
         }
     }
