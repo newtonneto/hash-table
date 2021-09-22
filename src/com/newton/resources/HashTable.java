@@ -99,12 +99,14 @@ public class HashTable implements IHashTable {
 
     @Override
     public Object removeElement(Object element) {
+        Integer element_index = findElement(element);
+
         // using linear probing
-        if (findElement(element) == null) {
+        if (element_index == null) {
             return "NO_SUCH_KEY";
         }
 
-        Integer index = findElement(element);
+        Integer index = element_index;
         Object temp = this.hashtable[index];
         this.hashtable[index] = "AVAILABLE";
 
