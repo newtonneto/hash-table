@@ -199,6 +199,18 @@ public class HashTable implements IHashTable {
         return dispersion_value % this.size;
     }
 
+    @Override
+    public void print() {
+        for (int index = 0; index < this.size; index++) {
+            if (this.hashtable[index] == null) {
+                System.out.print("[ available ]");
+            } else {
+                System.out.print("[ " + this.hashtable[index] + " ]");
+            }
+        }
+        System.out.println("");
+    }
+
     public Integer compressionDouble(Integer dispersion_value) {
         return (prime - (dispersion_value % prime));
     }
