@@ -59,8 +59,7 @@ public class HashTable implements IHashTable {
         double alfa = this.calculateAlfa();
 
         if (element instanceof String && element != "AVAILABLE" && alfa <= 0.5) {
-            // this.linearProbingInsert(compression_value, element);
-            this.reHash(compression_value, element);
+            this.linearProbingInsert(compression_value, element);
         } else if (alfa > 0.5) {
             // re hash
             this.reHash(compression_value, element);
