@@ -95,14 +95,14 @@ public class HashTable implements IHashTable {
                 }
             }
         } else if (alfa > 0.5) {
-            // re hash
+            System.out.println("-> A hash superou os 50% de espaço ocupado");
             this.reHash(element, type);
         } else {
             // exception here
         }
     }
 
-    public double calculateAlfa() {
+    private double calculateAlfa() {
         return this.used_slots / this.size;
     }
 
@@ -122,43 +122,20 @@ public class HashTable implements IHashTable {
         return removed_element;
     }
 
-    public boolean isPrime(int n) {
-        if (n % 2 == 0)
-            return false;
-
-        for (int i = 3; i <= Math.sqrt(n); i += 2) {
-            if (n % i == 0)
-                return false;
-        }
-
-        return true;
-    }
-
-    public int nextPrime(int n) {
-        int p;
-        if (n % 2 == 0)
-            n++;
-
-        for (p = n; p < 2 * n + 2; p += 2) {
-            if (isPrime(p))
-                return p;
-        }
-
-        return -1;
-    }
-
-    public void reHash(Object element, Character type) {
+    private void reHash(Object element, Character type) {
         this.resize();
+        System.out.println("-> Realocando items...");
         for (int i = 0; i < this.oldHash.length; i++) {
             if (this.oldHash[i] != null || this.oldHash[i] != "AVAILABLE") {
                 insertItem(this.oldHash[i], type);
             }
         }
 
+        // Após realocar todos os elementos, inserir o elemento solicitado
         insertItem(element, type);
     }
 
-    public Integer dispersion(Object element) {
+    private Integer dispersion(Object element) {
         Integer dispersion_value = 0;
 
         // Verifica se o objeto passado é uma string, que no caso é o tipo de elemento
@@ -176,11 +153,11 @@ public class HashTable implements IHashTable {
         return dispersion_value;
     }
 
-    public Integer compression(Integer dispersion_value) {
+    private Integer compression(Integer dispersion_value) {
         return dispersion_value % this.size;
     }
 
-    public Integer secondHash(Integer compression_value, Integer allocation_attempts, Integer dispersion_value) {
+    private Integer secondHash(Integer compression_value, Integer allocation_attempts, Integer dispersion_value) {
         Integer d2k = 7 - (dispersion_value % 7);
 
         return (compression_value + (allocation_attempts * d2k)) % this.size;
@@ -203,6 +180,7 @@ public class HashTable implements IHashTable {
     }
 
     private void resize() {
+        System.out.println("-> Dobrando o tamanho da hash...");
         this.oldHash = this.hashtable;
         this.size *= 2;
         this.hashtable = new Object[this.size];

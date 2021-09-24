@@ -80,5 +80,23 @@ public class Test {
         hash.print();
         hash.insertItem("NVIDIA", 'h');
         hash.print();
+
+        // Procurando o indice de um elemento presente na hash
+        System.out.println("Sapphire: " + hash.findElement("Sapphire", 'h'));
+
+        // Procurando o indice de um elemento que não existe na hash
+        System.out.println("Intel index: " + hash.findElement("Intel", 'h'));
+
+        // Removendo um elemento que não foi realocado (inserido de primeira)
+        hash.removeElement("AMD", 'h');
+        hash.print();
+
+        // Removendo um elemento que foi realocado (não foi inserido de primeira)
+        hash.removeElement("Sapphire", 'h');
+        hash.print();
+
+        // Inserindo elemento em um índice que já foi ocupado por algum elemento mas agora está vazio
+        hash.insertItem("AMD", 'h');
+        hash.print();
     }
 }
