@@ -53,13 +53,17 @@ public class HashTable implements IHashTable {
     }
 
     @Override
-    public void insertItem(Object element) {
+    public void insertItem(Object element, Character type) {
         Integer dispersion_value = this.dispersion(element);
         Integer compression_value = this.compression(dispersion_value);
         double alfa = this.calculateAlfa();
 
         if (element instanceof String && element != "AVAILABLE" && alfa <= 0.5) {
-            this.linearProbingInsert(compression_value, element);
+            if (type == 'l') {
+                this.linearProbingInsert(compression_value, element);
+            } else {
+                this.doubleHashInsert(compression_value, element, dispersion_value);
+            }
         } else if (alfa > 0.5) {
             // re hash
             this.reHash(compression_value, element);
@@ -93,6 +97,31 @@ public class HashTable implements IHashTable {
                 System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
                 allocation_attempts++;
                 compression_value = this.compression(compression_value + 1);
+            }
+        }
+    }
+
+    public void doubleHashInsert(Integer compression_value, Object element, Integer dispersion_value) {
+        // Armazena a quantidade de tentativas de alocação, o número não deve execeder o
+        // tamanho do array
+        Integer allocation_attempts = 0;
+
+        while (allocation_attempts < this.size) {
+            // Recebe o que está armazenado no indice atual
+            Object storaged_item = this.hashtable[compression_value];
+
+            if (storaged_item == null || storaged_item == "AVAILABLE") {
+                System.out.println("-> Alocando " + element + " no índice " + compression_value + " após "
+                        + allocation_attempts + " tentativa(s) de inserção.");
+
+                this.hashtable[compression_value] = element;
+                this.used_slots++;
+
+                return;
+            } else {
+                System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
+                allocation_attempts++;
+                compression_value = this.secondSecondHash(compression_value, allocation_attempts, dispersion_value);
             }
         }
     }
@@ -175,7 +204,6 @@ public class HashTable implements IHashTable {
         }
     }
 
-    @Override
     public Integer dispersion(Object element) {
         Integer dispersion_value = 0;
 
@@ -194,9 +222,14 @@ public class HashTable implements IHashTable {
         return dispersion_value;
     }
 
-    @Override
     public Integer compression(Integer dispersion_value) {
         return dispersion_value % this.size;
+    }
+
+    public Integer secondSecondHash(Integer compression_value, Integer allocation_attempts, Integer dispersion_value) {
+        Integer d2k = 7 - (dispersion_value % 7);
+
+        return (compression_value + (allocation_attempts * d2k)) % this.size;
     }
 
     @Override
