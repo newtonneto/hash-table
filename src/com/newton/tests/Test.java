@@ -56,21 +56,29 @@ public class Test {
     public void testDoubleHash() {
         HashTable hash = new HashTable(13);
 
-        hash.insertItem("18", 'h');
+        hash.insertItem("AMD", 'h');
         hash.print();
-        hash.insertItem("41", 'h');
+        hash.insertItem("Corsair", 'h');
         hash.print();
-        hash.insertItem("22", 'h');
+        hash.insertItem("Galax", 'h');
         hash.print();
-        hash.insertItem("44", 'h');
+        hash.insertItem("EVGA", 'h');
         hash.print();
-        hash.insertItem("59", 'h');
+        hash.insertItem("Sharkoon", 'h');
         hash.print();
-        hash.insertItem("32", 'h');
+        hash.insertItem("Lian Li", 'h');
         hash.print();
-        hash.insertItem("31", 'h');
+        hash.insertItem("XFX", 'h');
         hash.print();
-        hash.insertItem("73", 'h');
+        hash.insertItem("Sapphire", 'h');
+        hash.print();
+        hash.insertItem("Asus", 'h');
+        hash.print();
+        hash.insertItem("PowerColor", 'h');
+        hash.print();
+        hash.insertItem("Palit", 'h');
+        hash.print();
+        hash.insertItem("NVIDIA", 'h');
         hash.print();
     }
 }
