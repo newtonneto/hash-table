@@ -8,10 +8,12 @@ public class HashTable implements IHashTable {
     private Integer prime = 7;
     private Object[] hashtable;
     private double used_slots;
+    private Object[] oldHash;
 
     public HashTable(Integer size) {
         this.size = size;
         this.hashtable = new Object[size];
+        this.oldHash = new Object[0];
         this.used_slots = 0;
     }
 
@@ -45,7 +47,7 @@ public class HashTable implements IHashTable {
                 if (type == 'l') {
                     compression_value = this.compression(compression_value + 1);
                 } else {
-                    compression_value = this.secondSecondHash(compression_value, find_attempts, dispersion_value);
+                    compression_value = this.secondHash(compression_value, find_attempts, dispersion_value);
                 }
             }
         }
@@ -88,13 +90,13 @@ public class HashTable implements IHashTable {
                     if (type == 'l') {
                         compression_value = this.compression(compression_value + 1);
                     } else {
-                        compression_value = this.secondSecondHash(compression_value, allocation_attempts, dispersion_value);
+                        compression_value = this.secondHash(compression_value, allocation_attempts, dispersion_value);
                     }
                 }
             }
         } else if (alfa > 0.5) {
             // re hash
-            this.reHash(compression_value, element);
+            this.reHash(element, type);
         } else {
             // exception here
         }
@@ -145,41 +147,15 @@ public class HashTable implements IHashTable {
         return -1;
     }
 
-    public void reHash(Integer compression_value, Object element) {
-        Integer allocation_attempts = 0;
-        Integer j = 1;
-
-        while (allocation_attempts < this.size) {
-            // Recebe o que está armazenado no indice atual
-            Object storaged_item = this.hashtable[compression_value];
-
-            if (storaged_item == null || storaged_item == "AVAILABLE") {
-                System.out.println("-> Alocando " + element + " no índice " + compression_value + " após "
-                        + allocation_attempts + " tentativa(s) de inserção.");
-
-                this.hashtable[compression_value] = element;
-                this.used_slots++;
-
-                return;
-            } else {
-                allocation_attempts++;
-
-                Integer index = compression_value;
-                Integer index2 = this.compressionDouble(compression_value + 1);
-
-                Integer newIndex = (index + j * index2) % this.size;
-
-                // if no collision occours
-                if (this.hashtable[newIndex] == null || this.hashtable[newIndex] == "AVAILABLE") {
-                    System.out.println("-> Realocando " + element + " no índice " + newIndex + " apos "
-                            + allocation_attempts + " tentativa(s) de inserção.");
-
-                    this.hashtable[newIndex] = element;
-                    return;
-                }
-                j++;
+    public void reHash(Object element, Character type) {
+        this.resize();
+        for (int i = 0; i < this.oldHash.length; i++) {
+            if (this.oldHash[i] != null || this.oldHash[i] != "AVAILABLE") {
+                insertItem(this.oldHash[i], type);
             }
         }
+
+        insertItem(element, type);
     }
 
     public Integer dispersion(Object element) {
@@ -204,7 +180,7 @@ public class HashTable implements IHashTable {
         return dispersion_value % this.size;
     }
 
-    public Integer secondSecondHash(Integer compression_value, Integer allocation_attempts, Integer dispersion_value) {
+    public Integer secondHash(Integer compression_value, Integer allocation_attempts, Integer dispersion_value) {
         Integer d2k = 7 - (dispersion_value % 7);
 
         return (compression_value + (allocation_attempts * d2k)) % this.size;
@@ -224,5 +200,12 @@ public class HashTable implements IHashTable {
 
     public Integer compressionDouble(Integer dispersion_value) {
         return (prime - (dispersion_value % prime));
+    }
+
+    private void resize() {
+        this.oldHash = this.hashtable;
+        this.size *= 2;
+        this.hashtable = new Object[this.size];
+        this.used_slots = 0;
     }
 }

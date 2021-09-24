@@ -8,6 +8,6 @@ public class Main {
         Test test = new Test();
 
         test.testLinearProbing();
-        //test.testDoubleHash();
+        test.testDoubleHash();
     }
 }
