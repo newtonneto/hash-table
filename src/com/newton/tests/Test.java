@@ -51,6 +51,16 @@ public class Test {
         // Inserindo elemento em um índice que já foi ocupado por algum elemento mas agora está vazio
         hash.insertItem("Ryzen 5 3600X", 'l');
         hash.print();
+
+        // Removendo um elemento que não existe na hash
+        hash.removeElement("Core i7", 'l');
+
+        // Inserindo inteiro
+        hash.insertItem(11, 'l');
+        hash.print();
+
+        // Pesquisando um elemento inteiro
+        System.out.println("11 index: " + hash.findElement(11, 'h'));
     }
 
     public void testDoubleHash() {
@@ -98,5 +108,15 @@ public class Test {
         // Inserindo elemento em um índice que já foi ocupado por algum elemento mas agora está vazio
         hash.insertItem("AMD", 'h');
         hash.print();
+
+        // Removendo um elemento que não existe na hash
+        hash.removeElement("Intel", 'h');
+
+        // Inserindo inteiro
+        hash.insertItem(11, 'h');
+        hash.print();
+
+        // Pesquisando um elemento inteiro
+        System.out.println("11 index: " + hash.findElement(11, 'h'));
     }
 }

@@ -63,7 +63,7 @@ public class HashTable implements IHashTable {
         Integer compression_value = this.compression(dispersion_value);
         double alfa = this.calculateAlfa();
 
-        if (element instanceof String && element != "AVAILABLE" && alfa <= 0.5) {
+        if ((element instanceof String || element instanceof Integer) && element != "AVAILABLE" && alfa <= 0.5) {
             // Armazena a quantidade de tentativas de alocação, o número não deve execeder o
             // tamanho do array
             Integer allocation_attempts = 0;
@@ -98,7 +98,7 @@ public class HashTable implements IHashTable {
             System.out.println("-> A hash superou os 50% de espaço ocupado");
             this.reHash(element, type);
         } else {
-            // exception here
+            System.out.println("-> Elemento inválido");
         }
     }
 
@@ -126,7 +126,7 @@ public class HashTable implements IHashTable {
         this.resize();
         System.out.println("-> Realocando items...");
         for (int i = 0; i < this.oldHash.length; i++) {
-            if (this.oldHash[i] != null || this.oldHash[i] != "AVAILABLE") {
+            if (this.oldHash[i] != null && this.oldHash[i] != "AVAILABLE") {
                 insertItem(this.oldHash[i], type);
             }
         }
@@ -148,6 +148,8 @@ public class HashTable implements IHashTable {
                 dispersion_value = dispersion_value
                         + (((int) ((String) element).charAt(index)) * ((int) Math.pow(2, index)));
             }
+        } else if (element instanceof Integer) {
+            dispersion_value = (Integer) element;
         }
 
         return dispersion_value;
