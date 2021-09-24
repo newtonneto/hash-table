@@ -16,15 +16,10 @@ public class HashTable implements IHashTable {
     }
 
     @Override
-    public Integer findElement(Object element) {
+    public Integer findElement(Object element, Character type) {
         Integer dispersion_value = this.dispersion(element);
         Integer compression_value = this.compression(dispersion_value);
-        Integer index_finded_element = this.linearProbingFind(compression_value, element);
 
-        return index_finded_element;
-    }
-
-    public Integer linearProbingFind(Integer compression_value, Object element) {
         // Armazena a quantidade de tentativas de busca, o número não deve execeder o
         // tamanho do array
         Integer find_attempts = 0;
@@ -34,7 +29,7 @@ public class HashTable implements IHashTable {
             Object storaged_item = this.hashtable[compression_value];
 
             if (storaged_item == null) {
-                System.out.println("NO_SUCH_KEY");
+                System.out.println("-> NO_SUCH_KEY");
 
                 return null;
             } else if (element == storaged_item) {
@@ -43,11 +38,19 @@ public class HashTable implements IHashTable {
                 return compression_value;
             } else {
                 find_attempts++;
-                compression_value = this.compression(compression_value + 1);
+
+                // Decide qual tipo de inserção será usado caso a primeira tentativa de inserção tenha falhado
+                // l = linear probing
+                // h = hash duplo
+                if (type == 'l') {
+                    compression_value = this.compression(compression_value + 1);
+                } else {
+                    compression_value = this.secondSecondHash(compression_value, find_attempts, dispersion_value);
+                }
             }
         }
 
-        System.out.println("NO_SUCH_KEY");
+        System.out.println("-> NO_SUCH_KEY");
 
         return null;
     }
@@ -59,10 +62,35 @@ public class HashTable implements IHashTable {
         double alfa = this.calculateAlfa();
 
         if (element instanceof String && element != "AVAILABLE" && alfa <= 0.5) {
-            if (type == 'l') {
-                this.linearProbingInsert(compression_value, element);
-            } else {
-                this.doubleHashInsert(compression_value, element, dispersion_value);
+            // Armazena a quantidade de tentativas de alocação, o número não deve execeder o
+            // tamanho do array
+            Integer allocation_attempts = 0;
+
+            while (allocation_attempts < this.size) {
+                // Recebe o que está armazenado no indice atual
+                Object storaged_item = this.hashtable[compression_value];
+
+                if (storaged_item == null || storaged_item == "AVAILABLE") {
+                    System.out.println("-> Alocando " + element + " no índice " + compression_value + " após "
+                            + allocation_attempts + " tentativa(s) de inserção.");
+
+                    this.hashtable[compression_value] = element;
+                    this.used_slots++;
+
+                    return;
+                } else {
+                    System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
+                    allocation_attempts++;
+
+                    // Decide qual tipo de inserção será usado caso a primeira tentativa de inserção tenha falhado
+                    // l = linear probing
+                    // h = hash duplo
+                    if (type == 'l') {
+                        compression_value = this.compression(compression_value + 1);
+                    } else {
+                        compression_value = this.secondSecondHash(compression_value, allocation_attempts, dispersion_value);
+                    }
+                }
             }
         } else if (alfa > 0.5) {
             // re hash
@@ -76,70 +104,20 @@ public class HashTable implements IHashTable {
         return this.used_slots / this.size;
     }
 
-    public void linearProbingInsert(Integer compression_value, Object element) {
-        // Armazena a quantidade de tentativas de alocação, o número não deve execeder o
-        // tamanho do array
-        Integer allocation_attempts = 0;
-
-        while (allocation_attempts < this.size) {
-            // Recebe o que está armazenado no indice atual
-            Object storaged_item = this.hashtable[compression_value];
-
-            if (storaged_item == null || storaged_item == "AVAILABLE") {
-                System.out.println("-> Alocando " + element + " no índice " + compression_value + " após "
-                        + allocation_attempts + " tentativa(s) de inserção.");
-
-                this.hashtable[compression_value] = element;
-                this.used_slots++;
-
-                return;
-            } else {
-                System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
-                allocation_attempts++;
-                compression_value = this.compression(compression_value + 1);
-            }
-        }
-    }
-
-    public void doubleHashInsert(Integer compression_value, Object element, Integer dispersion_value) {
-        // Armazena a quantidade de tentativas de alocação, o número não deve execeder o
-        // tamanho do array
-        Integer allocation_attempts = 0;
-
-        while (allocation_attempts < this.size) {
-            // Recebe o que está armazenado no indice atual
-            Object storaged_item = this.hashtable[compression_value];
-
-            if (storaged_item == null || storaged_item == "AVAILABLE") {
-                System.out.println("-> Alocando " + element + " no índice " + compression_value + " após "
-                        + allocation_attempts + " tentativa(s) de inserção.");
-
-                this.hashtable[compression_value] = element;
-                this.used_slots++;
-
-                return;
-            } else {
-                System.out.println("-> Espaço " + compression_value + " ocupado, passando para o próximo espaço...");
-                allocation_attempts++;
-                compression_value = this.secondSecondHash(compression_value, allocation_attempts, dispersion_value);
-            }
-        }
-    }
-
     @Override
-    public Object removeElement(Object element) {
-        Integer element_index = findElement(element);
+    public Object removeElement(Object element, Character type) {
+        Integer element_index = findElement(element, type);
 
-        // using linear probing
+        // Verifica se o elemento foi encontrado, caso o index seja nulo é pq não foi
         if (element_index == null) {
             return "NO_SUCH_KEY";
         }
 
-        Integer index = element_index;
-        Object temp = this.hashtable[index];
-        this.hashtable[index] = "AVAILABLE";
+        // Salva o elemento removido para retorno
+        Object removed_element = this.hashtable[element_index];
+        this.hashtable[element_index] = "AVAILABLE";
 
-        return temp;
+        return removed_element;
     }
 
     public boolean isPrime(int n) {
